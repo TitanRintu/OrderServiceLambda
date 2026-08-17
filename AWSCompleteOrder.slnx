@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/AWSCompleteOrder/AWSCompleteOrder.csproj" />
+  <Project Path="tests/AWSCompleteOrder.Tests/AWSCompleteOrder.Tests.csproj" />
+</Solution>

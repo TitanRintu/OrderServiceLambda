@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Order Lambda functions
+
+Globals:
+  Function:
+    Runtime: dotnet10
+    CodeUri: src/AWSCompleteOrder/
+    MemorySize: 256
+    Timeout: 90
+    Environment:
+      Variables:
+        RDS_ENDPOINT: database-2.cluster-clicaamiyk2t.us-east-2.rds.amazonaws.com
+        RDS_PORT: '5432'
+        RDS_DATABASE: postgres
+        RDS_USERNAME: postgres
+
+Resources:
+  DispatchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: DispatchFunction
+      Handler: AWSCompleteOrder::AWSCompleteOrder.DispatchFunction::FunctionHandler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+
+  OrderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: OrderFunction
+      Handler: AWSCompleteOrder::AWSCompleteOrder.OrderFunction::FunctionHandler
+      Environment:
+        Variables:
+          DISPATCH_FUNCTION_NAME: !Ref DispatchFunction
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action: rds-db:connect
+              Resource: arn:aws:rds-db:us-east-2:181486424227:dbuser:cluster-54SRLZK5BGRCQBAVD7U3H7E6GI/postgres
+            - Effect: Allow
+              Action: lambda:InvokeFunction
+              Resource: !GetAtt DispatchFunction.Arn
+
+  ShowDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ShowDataFunction
+      Handler: AWSCompleteOrder::AWSCompleteOrder.ShowDataFunction::FunctionHandler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action: rds-db:connect
+              Resource: arn:aws:rds-db:us-east-2:181486424227:dbuser:cluster-54SRLZK5BGRCQBAVD7U3H7E6GI/postgres
+
+Outputs:
+  OrderFunctionName:
+    Value: !Ref OrderFunction
+  DispatchFunctionName:
+    Value: !Ref DispatchFunction
+  ShowDataFunctionName:
+    Value: !Ref ShowDataFunction

@@ -1,0 +1,13 @@
+.DS_Store
+.aws-sam/
+.idea/
+bin/
+obj/
+*.dll
+*.exe
+*.so
+*.dylib
+.vscode/
+.vs/
+*.user
+*.sln.iml
